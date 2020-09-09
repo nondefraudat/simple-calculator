@@ -128,6 +128,9 @@ namespace string_math {
 	Number tan(Number a) {
 		return std::tan(a);
 	}
+	Number sqrt(Number a) {
+		return std::sqrt(a);
+	}
 
 	using LexemTemplates = std::map<std::string, Lexem>;
 
@@ -166,6 +169,9 @@ namespace string_math {
 		},
 		{"tan",
 			Lexem(MathFunction("tan", tan))
+		},
+		{"sqrt",
+			Lexem(MathFunction("sqrt", sqrt))
 		},
 	};
 
@@ -244,20 +250,20 @@ namespace string_math {
 				if (stack.empty()) {
 					throw "NUMBER_NOT_FOUND";
 				}
-				Number a = stack.back().GetNumber();
+				Number b = stack.back().GetNumber();
 				stack.pop_back();
 				if (it->IsOperation()) {
 					if (stack.empty()) {
 						throw "NUMBER_NOT_FOUND";
 					}
-					Number b = stack.back().GetNumber();
+					Number a = stack.back().GetNumber();
 					stack.pop_back();
 					stack.push_back(
 						Lexem(it->GetOperation().operation_hendler(a, b))
 					);
 				}
 				else {
-					stack.push_back(Lexem(it->GetMathFunction().math_function_hendler(a)));
+					stack.push_back(Lexem(it->GetMathFunction().math_function_hendler(b)));
 				}
 			}
 			it++;
