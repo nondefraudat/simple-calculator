@@ -1,13 +1,12 @@
-#ifndef NONDEFRAUDAT_EXPIREMENTS_STRING_MATH_H_
-#define NONDEFRAUDAT_EXPIREMENTS_STRING_MATH_H_
+#ifndef NONDEFRAUDAT_STRING_MATH_H_
+#define NONDEFRAUDAT_STRING_MATH_H_
+
+#define IMPORT __declspec(dllimport)
 
 #include "expression.h"
 
-namespace string_math {
-
-	char* ExtractSolution(const char* source_expression);
-	wchar_t* ExtractSolution(const wchar_t* source_expression);
-
+namespace nd_sm {
+	expression IMPORT calculate(expression);
 }
 
 #endif

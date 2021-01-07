@@ -1,96 +1,43 @@
-#ifndef NONDEFRAUDAT_EXPIREMENTS_STRING_MATH_LEXEM_H_
-#define NONDEFRAUDAT_EXPIREMENTS_STRING_MATH_LEXEM_H_
+#ifndef NONDEFRAUDAT_STRING_MATH_LEXEM_H_
+#define NONDEFRAUDAT_STRING_MATH_LEXEM_H_
 
-#include <iostream>
+#define IMPORT __declspec(dllimport)
 
-namespace string_math {
+#include "operation.h"
+#include "bracket.h"
 
-	enum class LexemType {
-		kUndefined,
-		kNumber,
-		kOpenBracket,
-		kCloseBracket,
-		kOperation,
-		kMathFunction
+#include <exception>
+#include <ostream>
+#include <string>
+
+namespace  nd_sm {
+	enum class lexem_type {
+		number,
+		function,
+		bracket
 	};
 
-	enum class Priority {
-		kUndefined,
-		kLastOrder,
-		kThirdOrder,
-		kSecondOrder,
-		kFirstOrder
-	};
-
-	using Number = double;
-
-
-	struct TextDefintion {
-		const char* text_definition;
-		explicit TextDefintion(const char* text_definition);
-	};
-
-	struct OpenBracket : TextDefintion {
-		explicit OpenBracket(const char* text_definition);
-	};
-
-	struct CloseBracket : TextDefintion {
-		const char* text_definition_of_friendly_bracket;
-		explicit CloseBracket(const char* text_definition, const char* text_definition_of_friendly_bracket);
-	};
-
-	struct Operation : TextDefintion {
-		Number(*operation_hendler)(Number, Number);
-		explicit Operation(const char* text_definition, Number(*operation_hendler)(Number, Number));
-	};
-
-	struct MathFunction : TextDefintion {
-		Number(*math_function_hendler)(Number);
-		explicit MathFunction(const char* text_definition, Number(*math_function_hendler)(Number));
-	};
-
-
-	class Lexem {
-		LexemType type_;
-		Priority priority_;
+	class IMPORT lexem {
+		lexem_type type_;
+		const char* definition_;
 		union {
-			Number number_;
-			OpenBracket open_bracket_;
-			CloseBracket close_bracket_;
-			Operation operation_;
-			MathFunction math_function_;
+			double number_;
+			operation_t operation_;
+			bracket_t bracket_;
 		};
 
-	protected:
-		explicit Lexem(LexemType, Priority);
-
 	public:
-		explicit Lexem();
+		explicit lexem(double number) noexcept;
+		explicit lexem(const char* definition, operation_t operation) noexcept;
+		explicit lexem(const char* definition, bracket_t bracket) noexcept;
 
-		explicit Lexem(Number);
-		explicit Lexem(OpenBracket);
-		explicit Lexem(CloseBracket);
-		explicit Lexem(Operation, Priority);
-		explicit Lexem(MathFunction);
+		const char* definition() const;
+		lexem_type type() const;
+		double number();
+		operation_t operation();
+		bracket_t bracket();
 
-		inline bool IsNumber();
-		inline bool IsOpenBracket();
-		inline bool IsCloseBracket();
-		inline bool IsOperation();
-		inline bool IsMathFunction();
-
-		LexemType GetType();
-		Priority GetPriority();
-
-		const char* GetDefinition();
-
-		Number GetNumber();
-		OpenBracket GetOpenBracket();
-		CloseBracket GetCloseBracket();
-		Operation GetOperation();
-		MathFunction GetMathFunction();
-
-		Lexem& operator=(const Lexem&);
+		friend std::ostream& operator<<(std::ostream& os, const lexem&);
 	};
 }
 

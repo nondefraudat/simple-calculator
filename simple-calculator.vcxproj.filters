@@ -18,24 +18,24 @@
     <ClCompile Include="simple_calculator.cc">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="deps\expression.cc">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="deps\lexem.cc">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="deps\string_math.cc">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Framework.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\string_math.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\bracket.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
     <ClInclude Include="deps\expression.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="deps\lexem.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="deps\string_math.h">
+    <ClInclude Include="deps\operation.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

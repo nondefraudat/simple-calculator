@@ -1,28 +1,39 @@
-#ifndef NONDEFRAUDAT_EXPIREMENTS_STRING_MATH_EXPRESSION_H_
-#define NONDEFRAUDAT_EXPIREMENTS_STRING_MATH_EXPRESSION_H_
+#ifndef NONDEFRAUDAT_STRING_MATH_EXPRESSION_H_
+#define NONDEFRAUDAT_STRING_MATH_EXPRESSION_H_
+
+#define IMPORT __declspec(dllimport)
 
 #include "lexem.h"
-#include <list>
-#include <map>
+#include "operation.h"
+#include "bracket.h"
+
+#include <list> 
+#include <string>
+#include <exception>
+#include <iostream>
 #include <cmath>
+#include <limits>
 
-namespace string_math {
+namespace nd_sm {
+	class IMPORT expression {
+		std::list<lexem> expression_;
+		std::list<lexem> result_;
 
-	using LexemChain = std::list<Lexem>;
-
-	class Expression {
-		LexemChain lexem_chain_;
+	protected:
+		expression(std::list<lexem> expression) noexcept;
 
 	public:
-		Expression();
-		Expression(const char* source_defintion);
-		Expression(const wchar_t* source_definieion);
+		expression(const char* definition);
+		expression(const wchar_t* definition);
 
-		Expression Solve();
-		Expression ExtractSolution();
+		~expression();
 
-		char* ConvertToCString();
-		wchar_t* ConvertToWString();
+		friend std::ostream& operator<<(std::ostream& os, const expression&);
+
+		expression result() noexcept;
+
+		char* c_str();
+		wchar_t* c_wstr();
 	};
 }
 

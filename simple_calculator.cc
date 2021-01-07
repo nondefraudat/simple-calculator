@@ -1,5 +1,6 @@
+#include "Framework.h"
+
 #include <windows.h>
-#include "deps/string_math.h"
 
 LRESULT CALLBACK MainWindowProc(HWND, UINT, WPARAM, LPARAM);
  
@@ -48,7 +49,7 @@ int WINAPI wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPWSTR cmd
 	
 LRESULT CALLBACK MainWindowProc(HWND window, UINT message, WPARAM wp_data, LPARAM lp_data) {
 
-	static enum ApplicationCommands {
+	enum ApplicationCommands : size_t {
 		AC_EXIT,
 		AC_GET_RESULT,
 		AC_GENERATE_RESULT
@@ -101,10 +102,8 @@ LRESULT CALLBACK MainWindowProc(HWND window, UINT message, WPARAM wp_data, LPARA
 				static wchar_t* buffer = new wchar_t[1000];
 				static const wchar_t* result;
 
-				using namespace string_math;
-
 				GetWindowText(edit_control_for_input, buffer, 1000);
-				result = ExtractSolution(buffer);
+				result = Calculate(buffer);
 				SetWindowText(edit_control_for_input, result);
 			}
 			catch (...) {
