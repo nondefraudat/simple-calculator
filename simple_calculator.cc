@@ -1,53 +1,41 @@
 #include "Framework.h"
 
-#include <windows.h>
+#include <Windows.h>
 
 LRESULT CALLBACK MainWindowProc(HWND, UINT, WPARAM, LPARAM);
  
-int WINAPI wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPWSTR cmd_line, _In_ INT cmd_mod) {
-
-	const wchar_t* const kApplicationName = L"Simple Calculator";
-
-	WNDCLASSEX main_application_window_template {
-		sizeof(WNDCLASSEX)
-	};
-	main_application_window_template.hInstance = instance;
-	main_application_window_template.hbrBackground = CreateSolidBrush(0x00000000);
-	main_application_window_template.lpszClassName = kApplicationName;
-	main_application_window_template.lpfnWndProc = MainWindowProc;
-	
-	RegisterClassEx(&main_application_window_template);
-
-	HWND main_application_window = CreateWindowEx(
-		WS_EX_TOPMOST, kApplicationName, L"", WS_POPUPWINDOW,
-		CW_USEDEFAULT, CW_USEDEFAULT, 400, 150,
-		NULL, NULL, instance, NULL
-	);
-
-	if (!main_application_window) {
-		MessageBox(
-			NULL, 
-			L"Ошибка при инициализации окна", 
-			L"Ошибка!", 
-			MB_OK | MB_ICONERROR
-		);
-		return 1;
+INT WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, _In_ INT) {
+	WNDCLASS cWnd = { sizeof(WNDCLASS) };
+	cWnd.hInstance = hInstance;
+	cWnd.lpfnWndProc = MainWindowProc;
+	cWnd.lpszClassName = L"MAIN";
+	cWnd.hbrBackground = CreateSolidBrush(RGB(51, 102, 153));
+	RegisterClass(&cWnd);
+	HWND hWnd = CreateWindowEx(WS_EX_TOPMOST,
+		cWnd.lpszClassName, nullptr,
+		WS_POPUP,
+		GetSystemMetrics(SM_CXSCREEN)/2 - 400/2,
+		GetSystemMetrics(SM_CYSCREEN)/2 - 150/2,
+		400, 150,
+		nullptr, nullptr,
+		cWnd.hInstance, 
+		nullptr);
+	ShowWindow(hWnd, SW_SHOWNORMAL);
+	UpdateWindow(hWnd);
+	MSG msg = {};
+	while (GetMessage(&msg, nullptr, NULL, NULL)) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
 	}
-
-	ShowWindow(main_application_window, cmd_mod);
-
-	MSG message = {
-
-	};
-	while (GetMessage(&message, NULL, NULL, NULL)) {
-		TranslateMessage(&message);
-		DispatchMessage(&message);
-	}
-
-	return 0;
+	return static_cast<INT>(msg.message);
 }
 	
-LRESULT CALLBACK MainWindowProc(HWND window, UINT message, WPARAM wp_data, LPARAM lp_data) {
+LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT message, WPARAM wp_data, LPARAM lp_data) {
+
+	// color for elements: RGB(204, 236, 255)
+
+	static POINT pCursorPos;
+	static RECT rectWnd;
 
 	enum ApplicationCommands : size_t {
 		AC_EXIT,
@@ -56,7 +44,6 @@ LRESULT CALLBACK MainWindowProc(HWND window, UINT message, WPARAM wp_data, LPARA
 	};
 
 	static HWND edit_control_for_input;
-	static HWND exit_button;
 	static HWND generate_result_button;
 
 	switch (message) {
@@ -66,27 +53,46 @@ LRESULT CALLBACK MainWindowProc(HWND window, UINT message, WPARAM wp_data, LPARA
 			L"EDIT", NULL, WS_CHILD | WS_VISIBLE |
 			ES_LEFT | ES_MULTILINE | ES_AUTOHSCROLL,
 			100, 50, 200, 20,
-			window, (HMENU)AC_GET_RESULT, (HINSTANCE)GetWindowLongPtr(window, GWLP_HINSTANCE), NULL
-		);
-		exit_button = CreateWindow(
-			L"BUTTON", L"[E]", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
-			375, 5, 15, 15,
-			window, (HMENU)AC_EXIT, (HINSTANCE)GetWindowLongPtr(window, GWLP_HINSTANCE), NULL
+			hWnd, (HMENU)AC_GET_RESULT, (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE), NULL
 		);
 		generate_result_button = CreateWindow(
 			L"BUTTON", L"CALCULATE", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
 			150, 80, 100, 20,
-			window, (HMENU)AC_GENERATE_RESULT, (HINSTANCE)GetWindowLongPtr(window, GWLP_HINSTANCE), NULL
+			hWnd, (HMENU)AC_GENERATE_RESULT, (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE), NULL
 		);
-		return 0;
+		return EXIT_SUCCESS;
 
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
 	
+	case WM_PAINT:
+		static HDC hDC;
+		hDC = GetDC(hWnd);
+		static RECT rectClient;
+		GetClientRect(hWnd, &rectClient);
+		static HPEN hPen = CreatePen(PS_SOLID, 2, RGB(204, 236, 255));
+		SelectObject(hDC, hPen);
+		MoveToEx(hDC, rectClient.right - 5, rectClient.top + 5, NULL);
+		LineTo(hDC, rectClient.right - 15, rectClient.top + 15);
+		MoveToEx(hDC, rectClient.right - 15, rectClient.top + 5, NULL);
+		LineTo(hDC, rectClient.right - 5, rectClient.top + 15);
+		ReleaseDC(hWnd, hDC);
+
+		return EXIT_SUCCESS;
+
 	case WM_NCHITTEST:
+		GetCursorPos(&pCursorPos);
+		GetWindowRect(hWnd, &rectWnd);
+		if (pCursorPos.x > rectWnd.right - 15 and pCursorPos.x < rectWnd.right - 5
+			and pCursorPos.y > rectWnd.top + 5 and pCursorPos.y < rectWnd.top + 15) {
+			if (GetKeyState(VK_LBUTTON)) {
+				PostMessage(hWnd, WM_DESTROY, NULL, NULL);
+			}
+			break;
+		}
 		static LRESULT result;
-		result = DefWindowProc(window, message, wp_data, lp_data);
+		result = DefWindowProc(hWnd, message, wp_data, lp_data);
 		return result == HTCLIENT ? HTCAPTION : result;
 
 	case WM_COMMAND:
@@ -94,7 +100,7 @@ LRESULT CALLBACK MainWindowProc(HWND window, UINT message, WPARAM wp_data, LPARA
 		switch (wp_data) {
 
 		case AC_EXIT:
-			PostMessage(window, WM_DESTROY, NULL, NULL);
+			PostMessage(hWnd, WM_DESTROY, NULL, NULL);
 			break;
 
 		case AC_GENERATE_RESULT:
@@ -108,7 +114,7 @@ LRESULT CALLBACK MainWindowProc(HWND window, UINT message, WPARAM wp_data, LPARA
 			}
 			catch (...) {
 				MessageBox(
-					window, 
+					hWnd, 
 					L"Что-то пошло не так, попробуйте еще раз...", 
 					L"Ошибка!", 
 					MB_OK | MB_ICONERROR
@@ -122,6 +128,6 @@ LRESULT CALLBACK MainWindowProc(HWND window, UINT message, WPARAM wp_data, LPARA
 		return 0;
 
 	default:
-		return DefWindowProc(window, message, wp_data, lp_data);
+		return DefWindowProc(hWnd, message, wp_data, lp_data);
 	}
 }
