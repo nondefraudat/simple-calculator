@@ -1,6 +1,7 @@
-#include "Framework.h"
-
 #include <Windows.h>
+#include <string-math.hpp>
+
+using namespace std;
 
 LRESULT CALLBACK MainWindowProc(HWND, UINT, WPARAM, LPARAM);
  
@@ -8,7 +9,7 @@ INT WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, _
 	WNDCLASS cWnd = { sizeof(WNDCLASS) };
 	cWnd.hInstance = hInstance;
 	cWnd.lpfnWndProc = MainWindowProc;
-	cWnd.lpszClassName = L"MAIN";
+	cWnd.lpszClassName = "MAIN";
 	cWnd.hbrBackground = CreateSolidBrush(RGB(51, 102, 153));
 	RegisterClass(&cWnd);
 	HWND hWnd = CreateWindowEx(WS_EX_TOPMOST,
@@ -54,13 +55,13 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
 	static HDC hDC;
 
-	static wchar_t* lpszBuffer = new wchar_t[7000];
-	static const wchar_t* lpszResult;
+	static char* lpszBuffer = new char[7000];
+	static const char* lpszResult;
 
 	switch (uMsg) {
 
 	case WM_CREATE:
-		hEditIn = CreateWindow(L"EDIT",
+		hEditIn = CreateWindow("EDIT",
 			nullptr, 
 			WS_VISIBLE | WS_CHILD | ES_LEFT | ES_AUTOHSCROLL,
 			rectEdit.left + 2, 
@@ -70,7 +71,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			hWnd, IDC_EDITIN,
 			hInstance, 
 			NULL);
-		hEditOut = CreateWindow(L"EDIT",
+		hEditOut = CreateWindow("EDIT",
 			nullptr, 
 			WS_VISIBLE | WS_CHILD | ES_CENTER | ES_READONLY,
 			rectStatic.left + 2,
@@ -90,11 +91,14 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	case WM_PAINT:
 		GetWindowText(hEditIn, lpszBuffer, 7000);
 		try {
-			lpszResult = Calculate(lpszBuffer);
+			double result = calculate(lpszBuffer);
+			static string strResult;
+			strResult = to_string(result);
+			lpszResult = strResult.c_str();
 			SetWindowText(hEditOut, lpszResult);
 		}
 		catch (...) {
-			SetWindowText(hEditOut, L"ERROR");
+			SetWindowText(hEditOut, "ERROR");
 		}
 		hDC = GetDC(hWnd);
 		GetClientRect(hWnd, &rectClient);

@@ -1,0 +1,3 @@
+[submodule "deps/string-math"]
+	path = deps/string-math
+	url = https://github.com/nondefraudat/string-math.git
