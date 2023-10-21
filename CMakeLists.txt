@@ -12,7 +12,7 @@ set(EXECUTABLE_NAME simple-calculator)
 
 file(GLOB_RECURSE PROJECT_SOURCES "src/*")
 if (NO_GUI)
-	add_executable(${EXECUTABLE_NAME} ${PROJECT_SOURCES})
+	add_executable(${EXECUTABLE_NAME} src/main.cpp src/consoleapp.cpp src/consoleapp.hpp )
 	target_compile_definitions(${EXECUTABLE_NAME} PRIVATE NO_GUI)
 else (NO_GUI)
 	add_executable(${EXECUTABLE_NAME} WIN32 ${PROJECT_SOURCES})

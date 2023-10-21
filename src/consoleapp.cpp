@@ -7,10 +7,11 @@ using namespace std;
 int ConsoleApp::run() noexcept {
 	string expression;
 	while (true) {
-		cin >> expression;
+		getline(cin, expression);
 		if (expression == "exit()") {
 			return EXIT_SUCCESS;
 		}
-		cout << calculate(expression);
+		Expression test = expression;
+		cout << test << " = " << test.calculate() << endl;
 	}
 }
