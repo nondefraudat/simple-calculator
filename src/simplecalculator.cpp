@@ -10,9 +10,9 @@ int SimpleCalculator::run() noexcept {
 	string buffer;
 	getline(cin, buffer);
 	while (buffer != "exit()") {
-		getline(cin, buffer);
 		Expression expression = buffer;
 		cout << expression << " = " << expression.calculate() << endl;
+		getline(cin, buffer);
 	}
 	return EXIT_SUCCESS;
 }
