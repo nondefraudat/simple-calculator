@@ -1,4 +1,4 @@
-# How to build:
+# How to build
 
 ```bash
 git clone --recurse-submodules https://github.com/nondefraudat/simple-calculator.git
